@@ -1,0 +1,55 @@
+a=randi([1,6],1,40);
+b=randi([2,6],1,40).*a;
+c=rand(1,40)*0.3;
+w=randi([1,15],1,40);
+param=[w;a;b;c];
+lamata=1;
+st=1;
+et=10;
+opx=[0.6 0.8 0.9 0.7];
+quitflag=0;
+sumf=0;
+%保存操作员的工作时长和回报
+reops=zeros(4,80);
+optask=zeros(4,40);%任务分配结果
+opleft=zeros(4,40);%任务剩余时长
+opf=zeros(4,40);%任务回报
+for ii=1:10%分四步，每次10个任务
+    if(et>=40)
+        et=40;
+        quitflag=1;
+    end
+    task=param(:,st:et);
+    %opx=opxs(:,st);%下一阶段操作员利用率
+    opw=sum(opleft,2)';%操作员剩余时长
+    oplf=sum(opleft./optask.*opf,2);%操作员剩余回报
+    [ReOps,Result]=Allocate(task,opx,opw);%分配结果
+    sumf=sumf+Result(10);
+    reops(:,st:et)=ReOps(:,2:et-st+2);
+    reops(:,40+st:et+40)=ReOps(:,et-st+3:2*(et-st)+3);
+    optask(:,st:et)=reops(:,st:et)+reops(:,40+st:et+40);
+    %下一阶段状态更新
+    opx=ReOps(:,2*(et-st)+4)';
+    opleft(:,st:et)=optask(:,st:et);
+    oplefts=sum(opleft,2);
+    [tempt,index]=min(oplefts);
+    oplests=oplefts-tempt;
+    opleft(index,:)=0;
+    for i=1:4
+        tempi=et;
+        while(oplests(i)>0)
+            oplests(i)=oplests(i)-opleft(i,tempi);
+            if(oplests(i)<=0)
+                opleft(i,1:tempi-1)=0;
+                opleft(i,tempi)=opleft(i,tempi)+oplests(i);
+                break;
+            end
+            tempi=tempi-1;
+        end
+    end
+    st=et+1;
+    et=et+floor(tempt);
+    if(quitflag==1)
+        break;
+    end
+end

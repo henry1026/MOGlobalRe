@@ -1,0 +1,11 @@
+%z=1,xi和xi1为本阶段和下阶段的利用率，timin为根据本阶段利用率算出的最小工作时长
+function [y,t,r]=fmax(a,b,c,w,xi,xi1)
+r=0;
+tmin=b*(37*xi*xi-37*xi+15)/(6*a);%最小时间
+tc=tmin:0.3:15;
+rc=log((1-exp(-tc)+xi*exp(-tc))/xi1);
+fy=w./(1+exp(-a*tc+b))-c*(tc+rc)-r*(tc+rc);
+[y,i]=max(fy);
+t=tc(i);
+r=rc(i);
+%fy=w./(1+exp(-a*tc+b))-c*tc-c*log((1-exp(-tc)+xi*exp(-tc))/xi1)

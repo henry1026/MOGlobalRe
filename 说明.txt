@@ -1,0 +1,9 @@
+Sorte1根据任务权重大小进行排序
+Constraint根据任务之间的约束关系对任务进行调整
+Allocate是任务分配主程序
+Initial产生初始解
+Gen是迭代次数
+Fitness是计算解得适应度
+Select选择
+Intersect是交叉
+Mutate是变异
